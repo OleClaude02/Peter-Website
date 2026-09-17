@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bilder – Peter Kinkelin</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Jost:wght@300;400;500&display=swap">
+<style>
+  :root {
+    --bg: #1B1E21;
+    --text: #F1F2F3;
+    --text-soft: #8A9095;
+    --nav: #9AA0A5;
+    --line: #2C3134;
+    --frame-line: #4A5054;
+    --frame-text: #6C7378;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    background: var(--bg);
+    font-family: 'Jost', 'Helvetica Neue', Arial, sans-serif;
+    color: var(--text);
+  }
+  .name { font-family: 'Cormorant Garamond', Georgia, serif; }
+
+  nav {
+    display: flex;
+    justify-content: center;
+    gap: 56px;
+    padding: 28px 0;
+    font-size: 14px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--line);
+  }
+  nav a { color: var(--nav); text-decoration: none; }
+  nav a:hover, nav a.active { color: var(--text); }
+
+  h1 {
+    text-align: center;
+    margin: 48px 0 0;
+    font-size: 40px;
+    font-weight: 500;
+  }
+  .subtitle {
+    text-align: center;
+    margin-top: 10px;
+    font-size: 14px;
+    color: var(--text-soft);
+    letter-spacing: 0.5px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    padding: 48px 6vw 72px;
+  }
+  @media (max-width: 900px) {
+    .grid { grid-template-columns: 1fr; padding: 32px 24px 56px; }
+  }
+
+  .frame {
+    aspect-ratio: 4 / 3;
+    border: 1px dashed var(--frame-line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .frame span {
+    color: var(--frame-text);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-size: 12px;
+  }
+
+  .video-tile {
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: #000;
+  }
+  .video-tile video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="Peter.html">Peter</a>
+  <a href="Bilder.html" class="active">Bilder</a>
+  <a href="Musik.html">Musik</a>
+</nav>
+
+<h1 class="name">Bilder</h1>
+
+<div class="grid">
+  <div class="frame"><span>Beispielbild</span></div>
+  <div class="frame"><span>Beispielbild</span></div>
+
+  <div class="video-tile">
+    <video controls preload="metadata" poster="assets/peter-video-poster.jpg">
+      <source src="assets/peter-video.mp4" type="video/mp4">
+    </video>
+  </div>
+
+  <div class="frame"><span>Beispielbild</span></div>
+  <div class="frame"><span>Beispielbild</span></div>
+  <div class="frame"><span>Beispielbild</span></div>
+</div>
+
+</body>
+</html>
