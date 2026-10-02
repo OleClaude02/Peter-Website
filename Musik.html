@@ -32,7 +32,7 @@
     z-index: -1;
     pointer-events: none;
     background: url('assets/musik-hintergrund.jpg') center / 100% 100% no-repeat;
-    opacity: 0.45;
+    opacity: 0.5;
     mix-blend-mode: lighten;
     -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent), linear-gradient(to top, transparent, #000 10%);
     -webkit-mask-composite: source-in;
@@ -87,19 +87,70 @@
     margin: 0 auto;
     padding: clamp(10px, 2vh, 24px) 24px 24px;
   }
+  .tracks { text-align: center; }
   .track {
-    border-top: 1px solid var(--line);
-    padding: clamp(6px, 1.3vh, 14px) 0;
+    padding: clamp(8px, 2vh, 22px) 0;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    align-items: center;
+    gap: 6px;
   }
-  .track:last-child { border-bottom: 1px solid var(--line); }
+  .track-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 100%;
+    padding: 4px 8px;
+    background: none;
+    border: 0;
+    color: var(--text);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9), 0 0 14px rgba(0, 0, 0, 0.7);
+    font: inherit;
+    cursor: pointer;
+    transition: opacity .2s;
+  }
+  .track-btn:hover { opacity: 0.8; }
+  .track.is-playing .track-title { font-weight: 600; }
+  .track-btn:disabled { cursor: default; opacity: .75; }
+  .track-btn:focus-visible { outline: 1px solid var(--text-soft); outline-offset: 2px; }
   .track-title {
-    font-size: clamp(18px, 2.6vh, 22px);
+    font-size: clamp(20px, 3.2vh, 28px);
     font-weight: 500;
+    line-height: 1.2;
   }
-  audio { width: 100%; height: 38px; }
+  .icon {
+    width: 12px;
+    height: 14px;
+    flex: none;
+    background: currentColor;
+    clip-path: polygon(0 0, 100% 50%, 0 100%);
+  }
+  .track.is-playing .icon {
+    clip-path: none;
+    background: linear-gradient(to right, currentColor 35%, transparent 35% 65%, currentColor 65%);
+  }
+  .track.is-empty .icon { visibility: hidden; }
+  .progress {
+    width: min(320px, 70%);
+    padding: 8px 0;
+    cursor: pointer;
+  }
+  .progress::before {
+    content: '';
+    display: block;
+    height: 2px;
+    background: rgba(241, 242, 243, 0.3);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  }
+  .progress span {
+    display: block;
+    height: 2px;
+    width: 0;
+    margin-top: -2px;
+    background: var(--text);
+  }
+  .track.is-empty .progress { visibility: hidden; cursor: default; }
+  audio { display: none; }
 </style>
 </head>
 <body>
@@ -117,39 +168,73 @@
 
 <div class="tracks">
   <div class="track">
-    <div class="track-title name">Spiegelbild - Pete</div>
-    <audio controls preload="none">
-      <source src="assets/spiegelbild.mp3" type="audio/mpeg">
-    </audio>
+    <button class="track-btn" type="button"><span class="icon" aria-hidden="true"></span><span class="track-title name">Spiegelbild - Pete</span></button>
+    <div class="progress"><span></span></div>
+    <audio preload="none"><source src="assets/spiegelbild.mp3" type="audio/mpeg"></audio>
   </div>
 
   <div class="track">
-    <div class="track-title name">Highlife - Pete</div>
-    <audio controls preload="none">
-      <source src="assets/highlife.mp3" type="audio/mpeg">
-    </audio>
+    <button class="track-btn" type="button"><span class="icon" aria-hidden="true"></span><span class="track-title name">Highlife - Pete</span></button>
+    <div class="progress"><span></span></div>
+    <audio preload="none"><source src="assets/highlife.mp3" type="audio/mpeg"></audio>
   </div>
 
   <div class="track">
-    <div class="track-title name">vile. & DIIRO - Fly (feat. Jessy)</div>
-    <audio controls preload="none">
-      <source src="assets/fly.mp3" type="audio/mpeg">
-    </audio>
+    <button class="track-btn" type="button"><span class="icon" aria-hidden="true"></span><span class="track-title name">vile. &amp; DIIRO - Fly (feat. Jessy)</span></button>
+    <div class="progress"><span></span></div>
+    <audio preload="none"><source src="assets/fly.mp3" type="audio/mpeg"></audio>
   </div>
 
   <div class="track">
-    <div class="track-title name">Smoke a Cigarette - Pete</div>
-    <audio controls preload="none">
-      <source src="assets/smoke-a-cigarette.mp3" type="audio/mpeg">
-    </audio>
+    <button class="track-btn" type="button"><span class="icon" aria-hidden="true"></span><span class="track-title name">Smoke a Cigarette - Pete</span></button>
+    <div class="progress"><span></span></div>
+    <audio preload="none"><source src="assets/smoke-a-cigarette.mp3" type="audio/mpeg"></audio>
   </div>
 
   <div class="track">
-    <div class="track-title name">Bleib bei mir, Herr (EG 488)</div>
-    <audio controls preload="none"></audio>
+    <button class="track-btn" type="button"><span class="icon" aria-hidden="true"></span><span class="track-title name">Bleib bei mir, Herr (EG 488)</span></button>
+    <div class="progress"><span></span></div>
+    <audio preload="none"></audio>
   </div>
 </div>
 
 <script src="assets/site.js"></script>
+<script>
+  document.querySelectorAll('.track').forEach(function (track) {
+    var audio = track.querySelector('audio');
+    var btn = track.querySelector('.track-btn');
+    var bar = track.querySelector('.progress');
+    var fill = bar.firstElementChild;
+
+    if (!audio.querySelector('source')) {
+      track.classList.add('is-empty');
+      btn.disabled = true;
+      return;
+    }
+
+    btn.addEventListener('click', function () {
+      if (audio.paused) {
+        var p = audio.play();
+        if (p && p.catch) p.catch(function () {});
+      } else {
+        audio.pause();
+      }
+    });
+    audio.addEventListener('play', function () { track.classList.add('is-playing'); });
+    audio.addEventListener('pause', function () { track.classList.remove('is-playing'); });
+    audio.addEventListener('ended', function () {
+      track.classList.remove('is-playing');
+      fill.style.width = '0';
+    });
+    audio.addEventListener('timeupdate', function () {
+      if (audio.duration) fill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+    });
+    bar.addEventListener('click', function (e) {
+      if (!audio.duration) return;
+      var r = bar.getBoundingClientRect();
+      audio.currentTime = Math.min(Math.max((e.clientX - r.left) / r.width, 0), 1) * audio.duration;
+    });
+  });
+</script>
 </body>
 </html>
