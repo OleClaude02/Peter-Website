@@ -22,6 +22,19 @@
   }
   .name { font-family: 'Cormorant Garamond', Georgia, serif; }
 
+  .bg-photo {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: url('assets/musik-hintergrund.jpg') left bottom / auto 100% no-repeat;
+    opacity: 0.45;
+    mix-blend-mode: lighten;
+  }
+  @media (max-width: 700px) {
+    .bg-photo { background-position: 12% center; }
+  }
+
   nav {
     display: flex;
     justify-content: center;
@@ -70,6 +83,8 @@
 </style>
 </head>
 <body>
+
+<div class="bg-photo" aria-hidden="true"></div>
 
 <nav>
   <a href="index.html">Peter</a>
