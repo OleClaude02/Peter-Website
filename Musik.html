@@ -142,13 +142,37 @@
     background: rgba(241, 242, 243, 0.3);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
   }
+  .progress {
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+  }
   .progress span {
     display: block;
+    position: relative;
     height: 2px;
     width: 0;
     margin-top: -2px;
     background: var(--text);
   }
+  .progress span::after {
+    content: '';
+    position: absolute;
+    right: -6px;
+    top: 50%;
+    width: 12px;
+    height: 12px;
+    margin-top: -6px;
+    border-radius: 50%;
+    background: var(--text);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+    opacity: 0;
+    transition: opacity .2s, transform .15s;
+  }
+  .track.is-playing .progress span::after,
+  .track.has-progress .progress span::after,
+  .progress:hover span::after { opacity: 1; }
+  .track.is-seeking .progress span::after { transform: scale(1.3); }
   .track.is-empty .progress { visibility: hidden; cursor: default; }
 
   .title-row {
@@ -197,25 +221,25 @@
   <div class="track">
     <button class="track-btn" type="button"><span class="icon" aria-hidden="true"></span><span class="track-title name">Spiegelbild - Pete</span></button>
     <div class="progress"><span></span></div>
-    <audio preload="none"><source src="assets/spiegelbild.mp3" type="audio/mpeg"></audio>
+    <audio preload="metadata"><source src="assets/spiegelbild.mp3" type="audio/mpeg"></audio>
   </div>
 
   <div class="track">
     <button class="track-btn" type="button"><span class="icon" aria-hidden="true"></span><span class="track-title name">Highlife - Pete</span></button>
     <div class="progress"><span></span></div>
-    <audio preload="none"><source src="assets/highlife.mp3" type="audio/mpeg"></audio>
+    <audio preload="metadata"><source src="assets/highlife.mp3" type="audio/mpeg"></audio>
   </div>
 
   <div class="track">
     <button class="track-btn" type="button"><span class="icon" aria-hidden="true"></span><span class="track-title name">vile. &amp; DIIRO - Fly (feat. Jessy)</span></button>
     <div class="progress"><span></span></div>
-    <audio preload="none"><source src="assets/fly.mp3" type="audio/mpeg"></audio>
+    <audio preload="metadata"><source src="assets/fly.mp3" type="audio/mpeg"></audio>
   </div>
 
   <div class="track">
     <button class="track-btn" type="button"><span class="icon" aria-hidden="true"></span><span class="track-title name">Smoke a Cigarette - Pete</span></button>
     <div class="progress"><span></span></div>
-    <audio preload="none"><source src="assets/smoke-a-cigarette.mp3" type="audio/mpeg"></audio>
+    <audio preload="metadata"><source src="assets/smoke-a-cigarette.mp3" type="audio/mpeg"></audio>
   </div>
 
   <div class="track">
@@ -264,17 +288,44 @@
     audio.addEventListener('play', function () { track.classList.add('is-playing'); });
     audio.addEventListener('pause', function () { track.classList.remove('is-playing'); });
     audio.addEventListener('ended', function () {
-      track.classList.remove('is-playing');
+      track.classList.remove('is-playing', 'has-progress');
       fill.style.width = '0';
     });
-    audio.addEventListener('timeupdate', function () {
-      if (audio.duration) fill.style.width = (audio.currentTime / audio.duration * 100) + '%';
-    });
-    bar.addEventListener('click', function (e) {
-      if (!audio.duration) return;
+
+    var dragging = false;
+    var ratio = 0;
+    function ratioFrom(e) {
       var r = bar.getBoundingClientRect();
-      audio.currentTime = Math.min(Math.max((e.clientX - r.left) / r.width, 0), 1) * audio.duration;
+      return Math.min(Math.max((e.clientX - r.left) / r.width, 0), 1);
+    }
+    function showRatio(value) {
+      fill.style.width = (value * 100) + '%';
+      track.classList.toggle('has-progress', value > 0);
+    }
+    audio.addEventListener('timeupdate', function () {
+      if (!dragging && audio.duration) showRatio(audio.currentTime / audio.duration);
     });
+    bar.addEventListener('pointerdown', function (e) {
+      if (!audio.duration) return;
+      dragging = true;
+      track.classList.add('is-seeking');
+      bar.setPointerCapture(e.pointerId);
+      ratio = ratioFrom(e);
+      showRatio(ratio);
+    });
+    bar.addEventListener('pointermove', function (e) {
+      if (!dragging) return;
+      ratio = ratioFrom(e);
+      showRatio(ratio);
+    });
+    function endDrag() {
+      if (!dragging) return;
+      dragging = false;
+      track.classList.remove('is-seeking');
+      audio.currentTime = ratio * audio.duration;
+    }
+    bar.addEventListener('pointerup', endDrag);
+    bar.addEventListener('pointercancel', endDrag);
   });
 </script>
 </body>

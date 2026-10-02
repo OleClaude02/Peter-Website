@@ -53,7 +53,7 @@
 
     document.addEventListener('touchstart', function (e) {
       if (e.touches.length !== 1) { tracking = false; return; }
-      var target = e.target.closest ? e.target.closest('audio, video') : null;
+      var target = e.target.closest ? e.target.closest('audio, video, .progress, input[type="range"]') : null;
       if (target) { tracking = false; return; }
       startX = e.touches[0].clientX;
       startY = e.touches[0].clientY;
