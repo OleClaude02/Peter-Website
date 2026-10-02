@@ -150,6 +150,26 @@
     background: var(--text);
   }
   .track.is-empty .progress { visibility: hidden; cursor: default; }
+
+  .title-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    margin-top: clamp(12px, 2.5vh, 28px);
+  }
+  .title-row h1 { margin: 0; }
+  .volume {
+    justify-self: start;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: clamp(10px, 2vw, 24px);
+    color: var(--text);
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.9));
+  }
+  .volume[hidden] { display: none; }
+  .volume svg { width: 18px; height: 18px; flex: none; }
+  .volume input { width: clamp(70px, 11vw, 120px); accent-color: #F1F2F3; cursor: pointer; }
   audio { display: none; }
 </style>
 </head>
@@ -163,7 +183,14 @@
   <a href="Musik.html" class="active">Musik</a>
 </nav>
 
-<h1 class="name">Musik</h1>
+<div class="title-row">
+  <span></span>
+  <h1 class="name">Musik</h1>
+  <label class="volume" id="volume" hidden>
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>
+    <input type="range" min="0" max="1" step="0.01" value="1" aria-label="Lautstärke">
+  </label>
+</div>
 <div class="subtitle">Musik von Pete</div>
 
 <div class="tracks">
@@ -199,6 +226,20 @@
 </div>
 
 <script src="assets/site.js"></script>
+<script>
+  (function () {
+    var volume = document.getElementById('volume');
+    var slider = volume.querySelector('input');
+    var probe = new Audio();
+    probe.volume = 0.5;
+    if (probe.volume !== 0.5) return;
+    volume.hidden = false;
+    slider.addEventListener('input', function () {
+      var v = parseFloat(slider.value);
+      document.querySelectorAll('audio').forEach(function (a) { a.volume = v; });
+    });
+  })();
+</script>
 <script>
   document.querySelectorAll('.track').forEach(function (track) {
     var audio = track.querySelector('audio');
