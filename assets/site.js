@@ -35,7 +35,7 @@
   // Nur ein Song gleichzeitig abspielen
   document.addEventListener('play', function (e) {
     var target = e.target;
-    if (!target || target.tagName !== 'AUDIO') return;
+    if (!target || target.tagName !== 'AUDIO' || target.paused) return;
     var audios = document.querySelectorAll('audio');
     for (var i = 0; i < audios.length; i++) {
       if (audios[i] !== target) audios[i].pause();
